@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0b1026">
+<title>Helicopter</title>
+<meta name="description" content="Hold to climb, release to fall. Fly the helicopter through the cave as far as you can.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main id="stage">
+  <canvas id="game" aria-label="Helicopter game"></canvas>
+
+  <div id="hud" class="hidden">
+    <div class="stat"><span class="label">Distance</span><span id="score">0</span></div>
+    <div class="stat right"><span class="label">Best</span><span id="best">0</span></div>
+    <button id="mute" type="button" aria-label="Toggle sound">🔊</button>
+  </div>
+
+  <section id="menu" class="overlay">
+    <h1>Helicopter</h1>
+    <p class="sub">Hold to climb. Release to fall.</p>
+    <p class="cta">Tap or press Space to start</p>
+    <p class="best-line">Best: <span id="menuBest">0</span></p>
+  </section>
+
+  <section id="over" class="overlay hidden">
+    <h2>Crashed!</h2>
+    <div class="result"><span id="finalScore">0</span><small>distance</small></div>
+    <p id="newBest" class="badge hidden">New best!</p>
+    <p class="best-line">Best: <span id="overBest">0</span></p>
+    <p class="cta">Tap or press Space to fly again</p>
+  </section>
+</main>
+<script src="game.js"></script>
+</body>
+</html>
