@@ -31,6 +31,8 @@ The API runs as the `helicopter-api` systemd service (`deploy/helicopter-api.ser
 
 ## Changelog
 
+**2026-10-15 — No stale cache — Always show the latest version.** Static files used to be cached by browsers for an hour, so players could keep seeing the old yellow helicopter after an update. They are now revalidated on every load (cheap, ETag-based), so new versions appear immediately.
+
 **2026-10-15 — Taller tunnel, red helicopter, leaderboard (HELI-1, HELI-2, HELI-3).** The cave is now noticeably taller (starts 500 units high and narrows to 310 instead of 250), so it is easier to fly. The helicopter is red, including smoke-free crash debris and the favicon. The start screen asks for a nickname, and after every crash the score is saved in a new SQLite-backed leaderboard service and the top 10 is shown with your own row highlighted.
 
 **2026-10-15 — Initial release — Helicopter game.** First version of the game: hold-to-climb physics with smooth tilt and rotor animation, procedurally generated cave that narrows over time, rock obstacles, parallax night sky, smoke and crash particles, screen shake, synthesised rotor and crash sounds, mute toggle, local best score, and mouse, touch and keyboard controls. Deployed at helicopter.superbyte.eu.
