@@ -22,7 +22,8 @@
   <section id="menu" class="overlay">
     <h1>Helicopter</h1>
     <p class="sub">Hold to climb. Release to fall.</p>
-    <p class="cta">Tap or press Space to start</p>
+    <label class="nick-wrap"><span>Your nickname</span><input id="nick" type="text" maxlength="16" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Enter nickname"></label>
+    <button id="play" type="button">Play</button>
     <p class="best-line">Best: <span id="menuBest">0</span></p>
   </section>
 
@@ -31,6 +32,7 @@
     <div class="result"><span id="finalScore">0</span><small>distance</small></div>
     <p id="newBest" class="badge hidden">New best!</p>
     <p class="best-line">Best: <span id="overBest">0</span></p>
+    <div class="lb"><h3>Leaderboard</h3><ol id="board"></ol><p id="boardNote"></p></div>
     <p class="cta">Tap or press Space to fly again</p>
   </section>
 </main>

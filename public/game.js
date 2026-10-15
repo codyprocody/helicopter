@@ -11,6 +11,8 @@
   const POINT_GAP = 260;                // spacing of cave control points
   const BEST_KEY = 'helicopter.best';
   const MUTE_KEY = 'helicopter.muted';
+  const NICK_KEY = 'helicopter.nick';
+  const NICK_RE = /^[\w .\-]{1,16}$/;
 
   const canvas = document.getElementById('game');
   const ctx = canvas.getContext('2d');
@@ -18,7 +20,7 @@
   const el = {
     hud: $('hud'), score: $('score'), best: $('best'), mute: $('mute'),
     menu: $('menu'), over: $('over'), final: $('finalScore'),
-    newBest: $('newBest'), menuBest: $('menuBest'), overBest: $('overBest'),
+    newBest: $('newBest'), nick: $('nick'), play: $('play'), board: $('board'), boardNote: $('boardNote'), menuBest: $('menuBest'), overBest: $('overBest'),
   };
 
   const store = {
@@ -35,13 +37,15 @@
   let camX = 0, speed = 0, dist = 0, time = 0, shake = 0, deadAt = 0;
   let heli, points, obstacles, particles;
   let lastScoreShown = -1;
+  let nickname = (store.get(NICK_KEY) || '').slice(0, 16);
+  let startedAt = 0;
 
   const rand = (a, b) => a + Math.random() * (b - a);
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const smooth = t => t * t * (3 - 2 * t);
 
   // ---------- Cave generation ----------
-  function gapFor(d) { return Math.max(250, 400 - d * 0.045); }
+  function gapFor(d) { return Math.max(310, 480 - d * 0.045); }
 
   function addPoint() {
     const last = points[points.length - 1];
@@ -76,7 +80,7 @@
   function resetWorld(demo) {
     camX = 0; dist = 0; time = 0; shake = 0;
     speed = demo ? 170 : 280;
-    points = [{ x: -POINT_GAP * 2, c: VIEW_H / 2, g: 420 }, { x: -POINT_GAP, c: VIEW_H / 2, g: 420 }, { x: 0, c: VIEW_H / 2, g: 420 }];
+    points = [{ x: -POINT_GAP * 2, c: VIEW_H / 2, g: 500 }, { x: -POINT_GAP, c: VIEW_H / 2, g: 500 }, { x: 0, c: VIEW_H / 2, g: 500 }];
     obstacles = [];
     particles = [];
     while (points[points.length - 1].x < W + POINT_GAP * 3) addPoint();
@@ -93,6 +97,7 @@
   }
 
   function startGame() {
+    startedAt = time;
     resetWorld(false);
     state = 'play';
     show('play');
@@ -117,11 +122,65 @@
       particles.push({ x: wx, y: heli.y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 80, life: 1, max: rand(0.5, 1.3), r: rand(2, 6), kind: i % 3 === 0 ? 'fire' : 'debris' });
     }
     Audio.crash();
+    submitScore(score, Math.round((time - startedAt) * 1000) + 1000);
     setTimeout(() => { if (state === 'dead') show('over'); }, 450);
   }
 
+  function tryStart() {
+    const n = el.nick.value.trim();
+    if (!NICK_RE.test(n)) {
+      el.nick.focus();
+      el.nick.classList.add('bad');
+      return false;
+    }
+    nickname = n;
+    store.set(NICK_KEY, n);
+    el.nick.blur();
+    startGame();
+    return true;
+  }
+
+  // ---------- Leaderboard ----------
+  function renderBoard(top, me) {
+    el.board.textContent = '';
+    if (!top || !top.length) { el.boardNote.textContent = 'No scores yet'; return; }
+    el.boardNote.textContent = '';
+    let youShown = false;
+    top.forEach((r, i) => {
+      const li = document.createElement('li');
+      const you = me && r.nick.toLowerCase() === me.toLowerCase();
+      if (you) { li.className = 'you'; youShown = true; }
+      const a = document.createElement('span'); a.className = 'pos'; a.textContent = i + 1;
+      const b = document.createElement('span'); b.className = 'nm'; b.textContent = r.nick;
+      const c = document.createElement('span'); c.className = 'sc'; c.textContent = r.score;
+      li.append(a, b, c);
+      el.board.appendChild(li);
+    });
+    return youShown;
+  }
+
+  async function submitScore(score, ms) {
+    el.boardNote.textContent = 'Loading leaderboard…';
+    el.board.textContent = '';
+    try {
+      const r = await fetch('/api/score', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nick: nickname, score, ms }),
+      });
+      if (!r.ok) throw new Error(r.status);
+      const d = await r.json();
+      renderBoard(d.top, nickname);
+      if (d.rank && d.rank > d.top.length) el.boardNote.textContent = `Your best rank: #${d.rank}`;
+    } catch {
+      try {
+        const r = await fetch('/api/leaderboard');
+        renderBoard((await r.json()).top, nickname);
+      } catch { el.boardNote.textContent = 'Leaderboard unavailable'; }
+    }
+  }
+
   function inputDown() {
-    if (state === 'menu') startGame();
+    if (state === 'menu') tryStart();
     else if (state === 'dead' && performance.now() - deadAt > 700) { resetWorld(true); startGame(); }
   }
 
@@ -301,7 +360,7 @@
         ctx.fillStyle = `rgba(255,${Math.floor(120 + 110 * a)},60,${a})`;
         ctx.beginPath(); ctx.arc(x, p.y, p.r * (0.6 + a), 0, 6.2832); ctx.fill();
       } else {
-        ctx.fillStyle = `rgba(255,207,74,${a})`;
+        ctx.fillStyle = `rgba(230,50,60,${a})`;
         ctx.fillRect(x - p.r / 2, p.y - p.r / 2, p.r, p.r);
       }
     }
@@ -313,9 +372,9 @@
     ctx.translate(heli.x, heli.y);
     ctx.rotate(heli.tilt);
     // shadow glow
-    ctx.shadowColor = 'rgba(255,207,74,.45)'; ctx.shadowBlur = 16;
+    ctx.shadowColor = 'rgba(255,70,70,.5)'; ctx.shadowBlur = 16;
     // tail boom
-    ctx.fillStyle = '#e6b436';
+    ctx.fillStyle = '#b81d2c';
     roundRect(-6, -4, -34, 7, 3); ctx.fill();
     roundRect(-40, -12, 6, 14, 3); ctx.fill();
     // tail rotor
@@ -324,7 +383,7 @@
     ctx.restore();
     // body
     const bg = ctx.createLinearGradient(0, -14, 0, 14);
-    bg.addColorStop(0, '#ffe07a'); bg.addColorStop(1, '#f0a81f');
+    bg.addColorStop(0, '#ff6b6b'); bg.addColorStop(1, '#c81e2f');
     ctx.fillStyle = bg;
     ctx.beginPath(); ctx.ellipse(2, 0, 26, 14, 0, 0, 6.2832); ctx.fill();
     ctx.shadowBlur = 0;
@@ -403,6 +462,7 @@
     const down = e => {
       if (e.target === el.mute) return;
       e.preventDefault();
+      if (state === 'menu') { held = 0; inputDown(); return; }
       held++;
       inputDown();
     };
@@ -415,8 +475,14 @@
     for (const id of ['menu', 'over']) {
       // overlays have pointer-events: none, so taps reach the canvas
       el[id].style.pointerEvents = 'none';
+      // ...except the menu's nickname field and Play button
+      if (id === 'menu') { el.nick.style.pointerEvents = 'auto'; el.play.style.pointerEvents = 'auto'; }
     }
     window.addEventListener('keydown', e => {
+      if (e.target === el.nick) {
+        if (e.code === 'Enter') { e.preventDefault(); tryStart(); }
+        return;
+      }
       if (['Space', 'ArrowUp', 'KeyW'].includes(e.code)) {
         e.preventDefault();
         if (!e.repeat) { keyHeld = true; inputDown(); }
@@ -426,6 +492,8 @@
       if (['Space', 'ArrowUp', 'KeyW'].includes(e.code)) keyHeld = false;
     });
     el.mute.addEventListener('click', toggleMute);
+    el.play.addEventListener('click', tryStart);
+    el.nick.addEventListener('input', () => el.nick.classList.remove('bad'));
     document.addEventListener('visibilitychange', () => { if (document.hidden) { held = 0; keyHeld = false; } });
   }
 
@@ -460,6 +528,7 @@
 
   // ---------- Boot ----------
   el.menuBest.textContent = best;
+  el.nick.value = nickname;
   el.mute.textContent = muted ? '🔇' : '🔊';
   resize();
   resetWorld(true);

@@ -1,0 +1,17 @@
+[Unit]
+Description=Helicopter leaderboard API
+After=network.target
+
+[Service]
+User=codex
+WorkingDirectory=/opt/projects/helicopter
+ExecStart=/usr/bin/python3 /opt/projects/helicopter/server/app.py
+Environment=HELI_PORT=8110
+Restart=on-failure
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/opt/projects/helicopter/data
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
