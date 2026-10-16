@@ -19,6 +19,22 @@
     <button id="mute" type="button" aria-label="Toggle sound">🔊</button>
   </div>
 
+  <button id="settingsBtn" type="button" aria-label="Settings">⚙️</button>
+
+  <section id="settings" class="hidden" role="dialog" aria-label="Settings">
+    <div class="panel">
+      <h3>Settings</h3>
+      <p class="group">Theme</p>
+      <div class="themes">
+        <button type="button" class="theme night" data-theme-choice="night" aria-pressed="true"><i></i>Night</button>
+        <button type="button" class="theme disco" data-theme-choice="disco" aria-pressed="false"><i></i>Disco</button>
+      </div>
+      <p class="group">Sound</p>
+      <button type="button" id="soundToggle" class="pill">On</button>
+      <button type="button" id="closeSettings" class="pill done">Done</button>
+    </div>
+  </section>
+
   <section id="menu" class="overlay">
     <h1>Helicopter</h1>
     <p class="sub">Hold to climb. Release to fall.</p>

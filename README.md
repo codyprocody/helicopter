@@ -9,7 +9,8 @@ Live at https://helicopter.superbyte.eu
 - Keyboard: hold Space, W or Arrow Up. `M` toggles sound.
 - Fly as far as you can through the cave and dodge the rock blocks. The cave narrows and speeds up the further you go.
 - Enter a nickname on the start screen; after each crash your score is submitted and the top 10 leaderboard is shown (best score per nickname).
-- Your nickname, personal best and sound preference are stored locally in the browser.
+- Open ⚙️ settings on the start or game-over screen to pick the Night (default) or Disco theme and toggle sound.
+- Your nickname, personal best, theme and sound preference are stored locally in the browser.
 
 ## Local development
 
@@ -30,6 +31,8 @@ Endpoints: `GET /api/leaderboard?limit=10`, `POST /api/score` `{nick, score, ms}
 The API runs as the `helicopter-api` systemd service (`deploy/helicopter-api.service`, bound to 127.0.0.1:8110) and Nginx proxies `/api/` to it with its own rate limit. Back up `data/scores.db` before risky changes. Static files are served by Nginx from `public/` using `deploy/helicopter.superbyte.eu.nginx.conf` (installed as `/etc/nginx/sites-enabled/helicopter-superbyte.conf`), with a Let's Encrypt certificate named `helicopter.superbyte.eu`, HTTP→HTTPS redirect, strict CSP and other security headers.
 
 ## Changelog
+
+**2026-10-16 — Settings, Disco theme, smaller helicopter (HELI-4, HELI-5).** A new ⚙️ settings panel (on the start and game-over screens) lets you choose the theme and toggle sound; the choice is remembered. The original Night theme stays the default, and the new Disco theme adds colour-cycling skies, sweeping light beams, a mirror ball, sparkles and a rainbow neon cave edge. The helicopter is now half its previous size, with its collision box, smoke trail and rotor check scaled to match.
 
 **2026-10-15 — No stale cache — Always show the latest version.** Static files used to be cached by browsers for an hour, so players could keep seeing the old yellow helicopter after an update. They are now revalidated on every load (cheap, ETag-based), so new versions appear immediately.
 
