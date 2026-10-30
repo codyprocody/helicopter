@@ -4,9 +4,9 @@
   // ---------- Config (world units: view is always 600 tall) ----------
   const VIEW_H = 600;
   const STEP = 1 / 120;
-  const GRAVITY = 1500;
-  const LIFT = 2300;
-  const MAX_VY = 520;
+  const GRAVITY = 950;
+  const LIFT = 1350;
+  const MAX_VY = 360;
   const HELI_SCALE = 0.5;               // helicopter drawn at half the original size
   const HELI_W = 56 * HELI_SCALE, HELI_H = 26 * HELI_SCALE;       // collision body
   const POINT_GAP = 260;                // spacing of cave control points
