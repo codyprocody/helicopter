@@ -32,7 +32,7 @@ The API runs as the `helicopter-api` systemd service (`deploy/helicopter-api.ser
 
 ## Changelog
 
-**2026-10-30 — [Less twitchy controls](https://github.com/codyprocody/helicopter/commit/38cd92f) — Gentler climb and fall.** Players found the helicopter too sensitive: it reached full climb/fall speed in about a quarter of a second, so tiny taps overshot. Gravity, lift and top vertical speed are lowered (1500→950, 2300→1350, 520→360), so the helicopter responds more gradually and is easier to hold steady in the narrowing cave.
+**2026-10-30 — [Less twitchy controls](https://github.com/codyprocody/helicopter/commit/9400444) — Gentler climb and fall.** Players found the helicopter too sensitive: it reached full climb/fall speed in about a quarter of a second, so tiny taps overshot. Gravity, lift and top vertical speed are lowered (1500→950, 2300→1350, 520→360), so the helicopter responds more gradually and is easier to hold steady in the narrowing cave.
 
 **2026-10-16 — Settings, Disco theme, smaller helicopter (HELI-4, HELI-5).** A new ⚙️ settings panel (on the start and game-over screens) lets you choose the theme and toggle sound; the choice is remembered. The original Night theme stays the default, and the new Disco theme adds colour-cycling skies, sweeping light beams, a mirror ball, sparkles and a rainbow neon cave edge. The helicopter is now half its previous size, with its collision box, smoke trail and rotor check scaled to match.
 
